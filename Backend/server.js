@@ -16,6 +16,6 @@ app.get('/', (req, res) => {
 
 const port = 5000
 
-app.listen(5000, () => {
+app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
 });
