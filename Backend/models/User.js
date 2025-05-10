@@ -16,11 +16,23 @@ const userSchema = new mongoose.Schema({
       'Please fill a valid email address'
     ]
   },
+  password: {
+    type: String,
+    required: true,
+    minlength: [6, 'Password must be at least 6 characters long']
+  },
   favorites: {
-    players: [String],
-    clubs: [String],
+    player: {
+      type: String,
+      required: true
+    },
+    club: {
+      type: String,
+      required: true
+    },
     leagues: [String]
   }
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('User', userSchema);
