@@ -1,10 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+<<<<<<< HEAD
+const { signup, login } = require('../controllers/userController');
 
+// Signup
+router.post('/', signup);
+
+// Login
+router.post('/login', login);
+
+module.exports = router;
+=======
+const authenticate = require('../middlewares/authenticate');
+>>>>>>> Authentication
+
+// Signup Route
 router.post('/', async (req, res) => {
   try {
     const { username, email, password, favorites } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
 
     const user = new User({
       username,
@@ -14,14 +34,42 @@ router.post('/', async (req, res) => {
     });
 
     const savedUser = await user.save();
-    res.status(201).json(savedUser);
+    res.status(201).json({ 
+      id: savedUser._id, 
+      username: savedUser.username 
+    });
 
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-router.put('/:id', async (req, res) => {
+// Login Route
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user || user.password !== password) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        favorites: user.favorites
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Protected Update Route
+router.put('/:id', authenticate, async (req, res) => {
   try {
     const { email, ...updateData } = req.body;
 
@@ -41,6 +89,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Get User by Username
 router.get('/username/:username', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
@@ -54,7 +103,5 @@ router.get('/username/:username', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-
 
 module.exports = router;
