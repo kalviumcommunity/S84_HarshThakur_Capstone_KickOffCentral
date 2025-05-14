@@ -24,13 +24,16 @@ const userSchema = new mongoose.Schema({
   favorites: {
     player: {
       type: String,
-      required: true
+      default: ''
     },
     club: {
       type: String,
-      required: true
+      default: ''
     },
-    leagues: [String]
+    leagues: {
+      type: [String],
+      default: []
+    }
   }
 }, { timestamps: true });
 
