@@ -1,13 +1,14 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import LandingPage from './assets/pages/LandingPage';
+import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header>
-        <h1>Welcome to Kickoff Central</h1>
-        <p>Your one-stop solution for organizing and managing events</p>
-        <button>Let's Go</button>
-      </header>
+    <div className="app-container">
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
     </div>
   );
 }
