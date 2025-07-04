@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { signup, login } = require('../controllers/userController');
+const { signup, login, googleAuth } = require('../controllers/userController');
 const authenticate = require('../middleware/authenticate');
 
 // Protected route for testing authentication
@@ -10,7 +10,7 @@ router.get('/protected', authenticate, (req, res) => {
 });
 
 // Signup route
-router.post('/', signup);
+router.post('/signup', signup);
 
 // Login route
 router.post('/login', login);
@@ -50,5 +50,7 @@ router.get('/username/:username', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.post('/google', googleAuth);
 
 module.exports = router;
