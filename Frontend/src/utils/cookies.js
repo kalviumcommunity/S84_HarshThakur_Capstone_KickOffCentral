@@ -1,11 +1,11 @@
 // Cookie utility functions
-const setCookie = (name, value, days = 7) => {
+export const setCookie = (name, value, days = 7) => {
   const expires = new Date();
   expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
 };
 
-const getCookie = (name) => {
+export const getCookie = (name) => {
   const nameEQ = name + "=";
   const ca = document.cookie.split(';');
   for (let i = 0; i < ca.length; i++) {
@@ -16,12 +16,6 @@ const getCookie = (name) => {
   return null;
 };
 
-const deleteCookie = (name) => {
+export const deleteCookie = (name) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-};
-
-module.exports = {
-  setCookie,
-  getCookie,
-  deleteCookie
 }; 
