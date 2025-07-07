@@ -1,3 +1,8 @@
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
+
 body {
   background: #101014;
   margin: 0;
@@ -5,17 +10,20 @@ body {
   min-height: 100vh;
   width: 100vw;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .dark-landing-root {
   min-height: 100vh;
+  height: 100vh;
   width: 100vw;
   background: url('/bg.jpg') center center/cover no-repeat, #101014;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .dark-landing-main {
@@ -30,6 +38,7 @@ body {
   box-sizing: border-box;
   gap: 4vw;
   min-height: calc(100vh - 120px); /* Account for footer */
+  height: 100%;
 }
 
 .dark-hero {
@@ -283,8 +292,11 @@ body {
 /* Enhanced Responsive Design */
 @media (max-width: 1200px) {
   .dark-landing-main {
-    padding: 0 3vw;
-    gap: 3vw;
+    flex-direction: column;
+    gap: 2vw;
+    padding: 0 2vw;
+    min-height: calc(100vh - 120px);
+    height: 100%;
   }
   
   .dark-hero, .dark-features-grid, .dark-slideshow {
@@ -320,8 +332,11 @@ body {
 
 @media (max-width: 600px) {
   .dark-landing-main {
+    flex-direction: column;
+    gap: 1vw;
     padding: 0 1vw;
-    gap: 1.5vw;
+    min-height: calc(100vh - 120px);
+    height: 100%;
   }
   
   .dark-hero, .dark-features-grid, .dark-slideshow {

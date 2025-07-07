@@ -116,11 +116,15 @@ export default function Login() {
 
         <button type="submit">Log In</button>
 
-        <hr />
-        <p style={{ textAlign: 'center' }}>or</p>
+        <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0 4px 0' }}>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
+          <span style={{ margin: '0 8px', color: '#888', fontSize: '0.95em' }}>or</span>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />
+        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 0, marginTop: 0 }}>
           <GoogleLogin
+            text="continue_with"
             onSuccess={handleGoogleLogin}
             onError={() => setError('Google login failed')}
           />
