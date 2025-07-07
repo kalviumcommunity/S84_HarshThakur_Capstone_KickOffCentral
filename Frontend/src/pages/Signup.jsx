@@ -4,6 +4,7 @@ import '../styles/Signup.css';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode'; // ✅ use named import
+import { setCookie, getCookie } from '../utils/cookies';
 
 export default function Signup() {
   const [form, setForm] = useState({
@@ -46,6 +47,12 @@ export default function Signup() {
 
       setSuccess('Signup successful! You can now log in.');
       setForm({ username: '', email: '', password: '' });
+      
+      // Save token in cookie if provided
+      if (res.data.token) {
+        setCookie('token', res.data.token, 7); // 7 days expiry
+      }
+      
       navigate('/favorites');
     } catch (err) {
       if (err.response?.data?.message) {
@@ -61,9 +68,14 @@ export default function Signup() {
       const decoded = jwtDecode(credentialResponse.credential);
 
       // Send to backend for account creation/login
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/google`, {
-        token: credentialResponse.credential
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/google`, {
+        token: credentialResponse.credential,
       });
+
+      // Save token in cookie if provided
+      if (res.data.token) {
+        setCookie('token', res.data.token, 7); // 7 days expiry
+      }
 
       setSuccess('Signed up successfully with Google!');
       navigate('/favorites');

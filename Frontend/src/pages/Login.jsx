@@ -4,6 +4,7 @@ import '../styles/Login.css';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode'; // ✅ fixed import
+import { setCookie, getCookie } from '../utils/cookies';
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -40,9 +41,12 @@ export default function Login() {
       setSuccess('Login successful!');
       setForm({ username: '', password: '' });
 
-      // Example: save token or user info if provided
-      // localStorage.setItem("token", res.data.token);
+      // Save token in cookie if provided
+      if (res.data.token) {
+        setCookie('token', res.data.token, 7); // 7 days expiry
+      }
 
+      // After login, go to home page
       navigate('/home');
     } catch (err) {
       if (err.response?.data?.message) {
@@ -59,11 +63,18 @@ export default function Login() {
       console.log("Google user:", decoded); // 👁️ View: name, email, sub
 
       // Send the token to backend for verification / session
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/google`, {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/google`, {
         token: credentialResponse.credential,
       });
 
+      // Save token in cookie if provided
+      if (res.data.token) {
+        setCookie('token', res.data.token, 7); // 7 days expiry
+      }
+
       setSuccess('Google login successful!');
+      
+      // After Google login, go to home page
       navigate('/home');
     } catch (err) {
       setError('Google login failed. Please try again.');

@@ -20,6 +20,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: [8, 'Password must be at least 8 characters long']
+  },
+  favoriteLeague: {
+    type: String,
+    default: null
+  },
+  favoriteClub: {
+    type: String,
+    default: null
+  },
+  favoritePlayer: {
+    type: String,
+    default: null
   }
 }, { timestamps: true });
 

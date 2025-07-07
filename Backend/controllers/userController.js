@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/jwt');
+const { SECRET_KEY, JWT_EXPIRES_IN } = require('../config/jwt');
 const { OAuth2Client } = require('google-auth-library');
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; // Set this in your .env
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -29,7 +29,7 @@ exports.signup = async (req, res) => {
     // Create token for new user
     const token = jwt.sign(
       { id: savedUser._id, username: savedUser.username },
-      JWT_SECRET,
+      SECRET_KEY,
       { expiresIn: JWT_EXPIRES_IN }
     );
 
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
     // Create a token
     const token = jwt.sign(
       { id: user._id, username: user.username },
-      JWT_SECRET,
+      SECRET_KEY,
       { expiresIn: JWT_EXPIRES_IN }
     );
 
@@ -105,7 +105,7 @@ exports.googleAuth = async (req, res) => {
     // Create JWT
     const jwtToken = jwt.sign(
       { id: user._id, username: user.username },
-      JWT_SECRET,
+      SECRET_KEY,
       { expiresIn: JWT_EXPIRES_IN }
     );
 
