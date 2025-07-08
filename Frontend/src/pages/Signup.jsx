@@ -14,6 +14,7 @@ export default function Signup() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -28,17 +29,21 @@ export default function Signup() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (form.username.length < 3) {
       setError('Username must be at least 3 characters long');
+      setLoading(false);
       return;
     }
     if (!validateEmail(form.email)) {
       setError('Please enter a valid email address');
+      setLoading(false);
       return;
     }
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters long');
+      setLoading(false);
       return;
     }
 
@@ -51,12 +56,14 @@ export default function Signup() {
             ? 'A user with this email already exists. Please log in or use a different email.'
             : 'Username already taken. Please choose another.'
         );
+        setLoading(false);
         return;
       }
       // Send OTP if user does not exist
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/otp/send-otp`, { email: form.email });
       // Navigate to verify-otp page with form data and OTP token
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/otp/send-otp`, { email: form.email });
       navigate('/verify-otp', { state: { ...form, otpToken: res.data.token } });
+      setLoading(false);
     } catch (err) {
       if (err.response?.data?.field === 'email') {
         setError('A user with this email already exists. Please log in or use a different email.');
@@ -67,6 +74,7 @@ export default function Signup() {
       } else {
         setError('An unexpected error occurred. Please try again.');
       }
+      setLoading(false);
     }
   };
 
@@ -133,7 +141,31 @@ export default function Signup() {
             placeholder="Enter password"
           />
         </label>
-        <button type="submit">Send OTP</button>
+        <button type="submit" disabled={loading}>
+          {loading ? (
+            <span>
+              <svg width="18" height="18" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#fff" style={{ verticalAlign: 'middle', marginRight: 6 }}>
+                <g fill="none" fillRule="evenodd">
+                  <g transform="translate(1 1)" strokeWidth="3">
+                    <circle strokeOpacity=".3" cx="18" cy="18" r="18" />
+                    <path d="M36 18c0-9.94-8.06-18-18-18">
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0 18 18"
+                        to="360 18 18"
+                        dur="1s"
+                        repeatCount="indefinite" />
+                    </path>
+                  </g>
+                </g>
+              </svg>
+              Sending OTP...
+            </span>
+          ) : (
+            'Send OTP'
+          )}
+        </button>
 
         <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0 4px 0' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />

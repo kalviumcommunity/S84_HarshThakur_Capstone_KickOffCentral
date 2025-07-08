@@ -52,11 +52,11 @@ export default function VerifyOtp() {
       // 2. Complete signup
       const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/signup`, { username, email, password });
       if (res.status === 200 || res.status === 201) {
-        setSuccess('Signup successful! You can now log in.');
+        setSuccess('Signup successful! Redirecting to your favourites...');
         if (res.data.token) {
           setCookie('token', res.data.token, 7);
         }
-        setTimeout(() => navigate('/login'), 1500);
+        setTimeout(() => navigate('/favorites'), 1500);
       } else {
         setError(res.data.message || 'Signup failed. Please try again.');
       }
