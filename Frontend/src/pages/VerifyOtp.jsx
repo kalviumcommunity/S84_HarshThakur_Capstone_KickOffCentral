@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { setCookie } from '../utils/cookies';
@@ -7,31 +7,11 @@ import '../styles/VerifyOtp.css';
 export default function VerifyOtp() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { email, username, password } = location.state || {};
+  const { email, username, password, otpToken } = location.state || {};
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [otpToken, setOtpToken] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Send OTP when component mounts
-    const sendOtp = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/otp/send-otp`, { email });
-        setOtpToken(res.data.token);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (email) {
-      sendOtp();
-    }
-  }, [email]);
+  const [loading, setLoading] = useState(false);
 
   // Handler for OTP input change
   const handleOtpChange = (e, idx) => {
@@ -93,48 +73,37 @@ export default function VerifyOtp() {
     return <div style={{ padding: 24 }}>Missing signup information. Please start from the signup page.</div>;
   }
 
-  if (loading) {
-    return (
-      <div className="verifyotp-container">
-        <div className="verifyotp-form" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div className="otp-spinner" style={{ marginBottom: 18 }}>
-              <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#667eea">
-                <g fill="none" fillRule="evenodd">
-                  <g transform="translate(1 1)" strokeWidth="3">
-                    <circle strokeOpacity=".3" cx="18" cy="18" r="18" />
-                    <path d="M36 18c0-9.94-8.06-18-18-18">
-                      <animateTransform
-                        attributeName="transform"
-                        type="rotate"
-                        from="0 18 18"
-                        to="360 18 18"
-                        dur="1s"
-                        repeatCount="indefinite" />
-                    </path>
-                  </g>
-                </g>
-              </svg>
-            </div>
-            <h2 style={{ margin: 0, color: '#f2e9e4' }}>Sending OTP</h2>
-            <div style={{ color: '#b0b0b8', fontSize: '1.08rem', marginTop: 8 }}>
-              We're sending a one-time password to <b>{email}</b>.<br/>
-              Please wait a moment...<br/>
-              <span style={{ fontSize: '0.98rem', color: '#888' }}>
-                Didn't receive it? Check your spam or promotions folder.
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="verifyotp-container">
       <form className="verifyotp-form" onSubmit={handleVerifyAndSignup}>
         <h2>Verify OTP</h2>
         <div style={{ marginBottom: 12 }}>OTP sent to <b>{email}</b></div>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <div className="otp-spinner" style={{ display: 'inline-block', marginBottom: 8 }}>
+            <svg width="28" height="28" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#667eea">
+              <g fill="none" fillRule="evenodd">
+                <g transform="translate(1 1)" strokeWidth="3">
+                  <circle strokeOpacity=".3" cx="18" cy="18" r="18" />
+                  <path d="M36 18c0-9.94-8.06-18-18-18">
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 18 18"
+                      to="360 18 18"
+                      dur="1s"
+                      repeatCount="indefinite" />
+                  </path>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div style={{ color: '#b0b0b8', fontSize: '1.01rem' }}>
+            Waiting for OTP email...<br/>
+            <span style={{ fontSize: '0.97rem', color: '#888' }}>
+              This may take a few seconds. Please check your inbox and spam/promotions folders.
+            </span>
+          </div>
+        </div>
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
         <label>

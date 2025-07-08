@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { signup, login, googleAuth } = require('../controllers/userController');
+const { signup, login, googleAuth, checkUserExists } = require('../controllers/userController');
 const authenticate = require('../middleware/authenticate');
 
 // Protected route for testing authentication
@@ -114,5 +114,7 @@ router.get('/username/:username', async (req, res) => {
 });
 
 router.post('/google', googleAuth);
+
+router.post('/check-user', checkUserExists);
 
 module.exports = router;

@@ -42,8 +42,32 @@ export default function Signup() {
       return;
     }
 
-    // Navigate to verify-otp page with form data (no OTP token)
-    navigate('/verify-otp', { state: { ...form } });
+    try {
+      // Check if user exists (by email or username)
+      const checkRes = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/check-user`, { email: form.email, username: form.username });
+      if (checkRes.data.exists) {
+        setError(
+          checkRes.data.field === 'email'
+            ? 'A user with this email already exists. Please log in or use a different email.'
+            : 'Username already taken. Please choose another.'
+        );
+        return;
+      }
+      // Send OTP if user does not exist
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/otp/send-otp`, { email: form.email });
+      // Navigate to verify-otp page with form data and OTP token
+      navigate('/verify-otp', { state: { ...form, otpToken: res.data.token } });
+    } catch (err) {
+      if (err.response?.data?.field === 'email') {
+        setError('A user with this email already exists. Please log in or use a different email.');
+      } else if (err.response?.data?.field === 'username') {
+        setError('Username already taken. Please choose another.');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    }
   };
 
   const handleGoogleSignup = async (credentialResponse) => {

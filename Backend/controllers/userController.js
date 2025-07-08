@@ -130,4 +130,20 @@ exports.googleAuth = async (req, res) => {
   }
 };
 
+exports.checkUserExists = async (req, res) => {
+  const { email, username } = req.body;
+  if (!email && !username) {
+    return res.status(400).json({ exists: false, message: 'Email or username is required' });
+  }
+  if (email) {
+    const user = await User.findOne({ email });
+    if (user) return res.json({ exists: true, field: 'email' });
+  }
+  if (username) {
+    const user = await User.findOne({ username });
+    if (user) return res.json({ exists: true, field: 'username' });
+  }
+  return res.json({ exists: false });
+};
+
 
