@@ -96,6 +96,9 @@ router.post('/verify-otp', async (req, res) => {
       });
     }
 
+    // Debug log for OTP comparison
+    console.log('Decoded OTP:', decoded.otp, 'Provided OTP:', otp);
+
     // Verify OTP
     if (decoded.otp !== otp) {
       return res.status(400).json({

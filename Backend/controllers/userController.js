@@ -16,6 +16,12 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: 'Username already taken' });
     }
 
+    // Check for existing email
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({

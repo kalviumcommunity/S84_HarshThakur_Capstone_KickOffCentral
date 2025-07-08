@@ -26,7 +26,7 @@ export default function Signup() {
     return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
 
     if (form.username.length < 3) {
@@ -42,25 +42,8 @@ export default function Signup() {
       return;
     }
 
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users`, form);
-
-      setSuccess('Signup successful! You can now log in.');
-      setForm({ username: '', email: '', password: '' });
-      
-      // Save token in cookie if provided
-      if (res.data.token) {
-        setCookie('token', res.data.token, 7); // 7 days expiry
-      }
-      
-      navigate('/favorites');
-    } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('An error occurred. Please try again.');
-      }
-    }
+    // Navigate to verify-otp page with form data (no OTP token)
+    navigate('/verify-otp', { state: { ...form } });
   };
 
   const handleGoogleSignup = async (credentialResponse) => {
@@ -86,7 +69,7 @@ export default function Signup() {
 
   return (
     <div className="signup-container">
-      <form className="signup-form" onSubmit={handleSubmit}>
+      <form className="signup-form" onSubmit={handleSendOtp}>
         <h2>Create Account</h2>
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
@@ -126,7 +109,7 @@ export default function Signup() {
             placeholder="Enter password"
           />
         </label>
-        <button type="submit">Sign Up</button>
+        <button type="submit">Send OTP</button>
 
         <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0 4px 0' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #ccc' }} />

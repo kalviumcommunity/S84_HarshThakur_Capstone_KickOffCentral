@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup';
 import Favourites from './pages/Favourites';
 import Home from './pages/Home';
+import VerifyOtp from './pages/VerifyOtp';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/favorites' element={<Favourites/>}/>
         <Route path='/home' element={<Home/>}/>
+        <Route path='/verify-otp' element={<VerifyOtp/>}/>
       </Routes>
     </div>
   );
