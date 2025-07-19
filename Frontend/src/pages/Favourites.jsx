@@ -98,6 +98,8 @@ export default function Favourites() {
   const [selectedPlayer, setSelectedPlayer] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
 
   // Check if user is logged in
@@ -107,6 +109,15 @@ export default function Favourites() {
       navigate('/login');
     }
   }, [navigate]);
+
+  // Update progress based on selections
+  useEffect(() => {
+    let newProgress = 0;
+    if (selectedLeague) newProgress += 33;
+    if (selectedClub) newProgress += 33;
+    if (selectedPlayer) newProgress += 34;
+    setProgress(newProgress);
+  }, [selectedLeague, selectedClub, selectedPlayer]);
 
   const handleLeagueChange = (league) => {
     setSelectedLeague(league);
@@ -149,9 +160,15 @@ export default function Favourites() {
       );
 
       setMessage({ text: 'Favorites saved successfully!', type: 'success' });
+      setShowConfetti(true);
+      
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+
       setTimeout(() => {
         navigate('/home');
-      }, 2000);
+      }, 3000);
     } catch (error) {
       console.error('Error saving favorites:', error);
       setMessage({ 
@@ -168,92 +185,158 @@ export default function Favourites() {
 
   return (
     <div className="favourites-container">
-      <div className="favourites-form">
-        <h1>Select Your Favorites</h1>
-        <p className="subtitle">Choose your favorite club and player from top leagues</p>
-        
-        {message.text && (
-          <div className={`message ${message.type}`}>
-            {message.text}
+      {showConfetti && (
+        <div className="confetti-container">
+          {[...Array(50)].map((_, i) => (
+            <div key={i} className="confetti" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${Math.random() * 2 + 2}s`
+            }}></div>
+          ))}
+        </div>
+      )}
+      
+      <div className="favourites-layout">
+        {/* Left Side - Form */}
+        <div className="form-section">
+          <div className="form-header">
+            <h1>Select Your Favorites</h1>
+            <p className="subtitle">Choose your favorite club and player from top leagues</p>
+            
+            <div className="progress-container">
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <span className="progress-text">{progress}% Complete</span>
+            </div>
           </div>
-        )}
+          
+          {message.text && (
+            <div className={`message ${message.type}`}>
+              {message.text}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="selection-group">
-            <label>
-              <span className="label-text">League</span>
-              <select 
-                value={selectedLeague} 
-                onChange={(e) => handleLeagueChange(e.target.value)}
-                required
-              >
-                <option value="">Select a League</option>
-                {Object.keys(leaguesData).map(league => (
-                  <option key={league} value={league}>{league}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          {selectedLeague && (
+          <form onSubmit={handleSubmit}>
             <div className="selection-group">
-              <label>
-                <span className="label-text">Club</span>
+              <label className="selection-label">
+                <span className="label-text">League</span>
                 <select 
-                  value={selectedClub} 
-                  onChange={(e) => handleClubChange(e.target.value)}
+                  value={selectedLeague} 
+                  onChange={(e) => handleLeagueChange(e.target.value)}
                   required
+                  className={selectedLeague ? 'selected' : ''}
                 >
-                  <option value="">Select a Club</option>
-                  {availableClubs.map(club => (
-                    <option key={club} value={club}>{club}</option>
+                  <option value="">Select a League</option>
+                  {Object.keys(leaguesData).map(league => (
+                    <option key={league} value={league}>{league}</option>
                   ))}
                 </select>
               </label>
             </div>
-          )}
 
-          {selectedClub && (
-            <div className="selection-group">
-              <label>
-                <span className="label-text">Player</span>
-                <select 
-                  value={selectedPlayer} 
-                  onChange={(e) => handlePlayerChange(e.target.value)}
-                  required
-                >
-                  <option value="">Select a Player</option>
-                  {availablePlayers.map(player => (
-                    <option key={player} value={player}>{player}</option>
-                  ))}
-                </select>
-              </label>
+            {selectedLeague && (
+              <div className="selection-group">
+                <label className="selection-label">
+                  <span className="label-text">Club</span>
+                  <select 
+                    value={selectedClub} 
+                    onChange={(e) => handleClubChange(e.target.value)}
+                    required
+                    className={selectedClub ? 'selected' : ''}
+                  >
+                    <option value="">Select a Club</option>
+                    {availableClubs.map(club => (
+                      <option key={club} value={club}>{club}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+
+            {selectedClub && (
+              <div className="selection-group">
+                <label className="selection-label">
+                  <span className="label-text">Player</span>
+                  <select 
+                    value={selectedPlayer} 
+                    onChange={(e) => handlePlayerChange(e.target.value)}
+                    required
+                    className={selectedPlayer ? 'selected' : ''}
+                  >
+                    <option value="">Select a Player</option>
+                    {availablePlayers.map(player => (
+                      <option key={player} value={player}>{player}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              disabled={loading || !selectedPlayer}
+              className={`submit-btn ${selectedPlayer ? 'ready' : ''} ${loading ? 'loading' : ''}`}
+            >
+              {loading ? (
+                <div className="loading-content">
+                  <div className="spinner"></div>
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                'Save Favorites'
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Right Side - Selection Summary */}
+        <div className="summary-section">
+          <div className="summary-card">
+            <h2>Your Selection</h2>
+            <div className="summary-content">
+              {selectedLeague ? (
+                <div className="summary-item">
+                  <div className="summary-label">League</div>
+                  <div className="summary-value">{selectedLeague}</div>
+                </div>
+              ) : (
+                <div className="summary-placeholder">
+                  <div className="placeholder-icon">🏆</div>
+                  <div className="placeholder-text">Select a league to get started</div>
+                </div>
+              )}
+
+              {selectedClub ? (
+                <div className="summary-item">
+                  <div className="summary-label">Club</div>
+                  <div className="summary-value">{selectedClub}</div>
+                </div>
+              ) : selectedLeague ? (
+                <div className="summary-placeholder">
+                  <div className="placeholder-icon">⚽</div>
+                  <div className="placeholder-text">Choose your favorite club</div>
+                </div>
+              ) : null}
+
+              {selectedPlayer ? (
+                <div className="summary-item">
+                  <div className="summary-label">Player</div>
+                  <div className="summary-value">{selectedPlayer}</div>
+                </div>
+              ) : selectedClub ? (
+                <div className="summary-placeholder">
+                  <div className="placeholder-icon">👤</div>
+                  <div className="placeholder-text">Pick your favorite player</div>
+                </div>
+              ) : null}
             </div>
-          )}
-
-          {selectedPlayer && (
-            <div className="selection-summary">
-              <h3>Your Selection</h3>
-              <div className="summary-item">
-                <strong>League:</strong> {selectedLeague}
-              </div>
-              <div className="summary-item">
-                <strong>Club:</strong> {selectedClub}
-              </div>
-              <div className="summary-item">
-                <strong>Player:</strong> {selectedPlayer}
-              </div>
-            </div>
-          )}
-
-          <button 
-            type="submit" 
-            disabled={loading || !selectedPlayer}
-            className="submit-btn"
-          >
-            {loading ? 'Saving...' : 'Save Favorites'}
-          </button>
-        </form>
+          </div>
+        </div>
       </div>
     </div>
   );
